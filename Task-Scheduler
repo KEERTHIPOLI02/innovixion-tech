@@ -1,0 +1,123 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
+
+class Task {
+    private String name;
+    private String description;
+    private int priority;
+    private long dueDate;
+
+    public Task(String name, String description, int priority, long dueDate) {
+        this.name = name;
+        this.description = description;
+        this.priority = priority;
+        this.dueDate = dueDate;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public long getDueDate() {
+        return dueDate;
+    }
+}
+
+class TaskScheduler {
+    private List<Task> tasks;
+
+    public TaskScheduler() {
+        this.tasks = new ArrayList<>();
+    }
+
+    public void addTask(Task task) {
+        tasks.add(task);
+        scheduleTaskNotification(task);
+    }
+
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    private void scheduleTaskNotification(Task task) {
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("Notification: Task '" + task.getName() + "' is due!");
+            }
+        }, task.getDueDate());
+    }
+}
+
+public class TaskManager {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        TaskScheduler taskScheduler = new TaskScheduler();
+
+        while (true) {
+            System.out.println("1. Add Task");
+            System.out.println("2. View Tasks");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    addTask(scanner, taskScheduler);
+                    break;
+                case 2:
+                    viewTasks(taskScheduler);
+                    break;
+                case 3:
+                    System.out.println("Exiting the application. Goodbye!");
+                    System.exit(0);
+                default:
+                    System.out.println("Invalid choice. Please enter a valid option.");
+            }
+        }
+    }
+
+    private static void addTask(Scanner scanner, TaskScheduler taskScheduler) {
+        scanner.nextLine(); // Consume the newline character
+        System.out.print("Enter task name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter task description: ");
+        String description = scanner.nextLine();
+        System.out.print("Enter task priority (1-5, where 1 is low and 5 is high): ");
+        int priority = scanner.nextInt();
+        System.out.print("Enter due date in milliseconds since epoch: ");
+        long dueDate = scanner.nextLong();
+
+        Task task = new Task(name, description, priority, dueDate);
+        taskScheduler.addTask(task);
+        System.out.println("Task added successfully!");
+    }
+
+    private static void viewTasks(TaskScheduler taskScheduler) {
+        List<Task> tasks = taskScheduler.getTasks();
+        if (tasks.isEmpty()) {
+            System.out.println("No tasks available.");
+        } else {
+            System.out.println("Tasks:");
+            for (Task task : tasks) {
+                System.out.println("Name: " + task.getName());
+                System.out.println("Description: " + task.getDescription());
+                System.out.println("Priority: " + task.getPriority());
+                System.out.println("Due Date: " + task.getDueDate());
+                System.out.println("--------------");
+            }
+        }
+    }
+}
